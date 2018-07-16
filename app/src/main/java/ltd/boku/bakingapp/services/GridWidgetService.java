@@ -14,6 +14,7 @@ import ltd.boku.bakingapp.R;
 import ltd.boku.bakingapp.model.Ingredient;
 import ltd.boku.bakingapp.model.Recipe;
 
+import static ltd.boku.bakingapp.fragment.MainFragment.RECIPE_EXTRA;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.INGREDIENT_EXTRA;
 
 public class GridWidgetService  extends RemoteViewsService{
@@ -62,6 +63,7 @@ class GridRemoteViewFactory implements RemoteViewsService.RemoteViewsFactory{
         Bundle extras=new Bundle();
         remoteView.setTextViewText(R.id.widget_recipe_name, recipe.getName());
         extras.putSerializable(INGREDIENT_EXTRA,(Serializable) recipe.getIngredients());
+        extras.putSerializable(RECIPE_EXTRA,(Serializable)recipe);
 
         Intent fillIntent=new Intent();
         fillIntent.putExtras(extras);

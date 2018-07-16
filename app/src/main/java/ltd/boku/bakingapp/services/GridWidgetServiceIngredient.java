@@ -55,7 +55,7 @@ class IngredientGridRemoteViewFactory implements RemoteViewsService.RemoteViewsF
         if (ingredients==null || ingredients.size() == 0)return null;
         Ingredient ingredient=ingredients.get(position);
 
-        RemoteViews remoteViews=new RemoteViews(context.getPackageName(), R.layout.ingredient_widget);
+        RemoteViews remoteViews=new RemoteViews(context.getPackageName(), R.layout.ingredient_widget_item);
 
         remoteViews.setTextViewText(R.id.widget_ingredient_name,ingredient.getIngredient());
 

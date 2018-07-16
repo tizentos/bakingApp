@@ -57,9 +57,6 @@ public class MainActivity extends AppCompatActivity
     Fragment currentFragment;
     MainActivityViewModel mainActivityViewModel;
 
-//    public interface  OnPopBackStackListener{
-//        void onPopBackStackListner();
-//    }
 
 
     @Override
@@ -69,26 +66,29 @@ public class MainActivity extends AppCompatActivity
         //start services
         initiateRecipeLoadingService();
         mainBinding= DataBindingUtil.setContentView(this,R.layout.activity_main);
+        setupUIPeripheral();
+        mainActivityViewModel=ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
-        List<Ingredient> string = (List<Ingredient>) getIntent().getSerializableExtra(INGREDIENT_EXTRA);
+        Recipe recipe=(Recipe)getIntent().getSerializableExtra(RECIPE_EXTRA);
+        if (recipe !=null){
+            navigateToRecipeStepListener(recipe);
+            return;
+        }
         if (savedInstanceState == null){
             navigateToHome();
         }
-
-        mainActivityViewModel=ViewModelProviders.of(this).get(MainActivityViewModel.class);
         mainActivityViewModel.getFragmentMutableLiveData().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
                 setCurrentFragment(fragment);
             }
         });
-
-        setupUIPeripheral();
-
     }
 
     private void setCurrentFragment(Fragment fragment) {
-        currentFragment= fragment;
+
+        currentFragment= (fragment == null)? new MainFragment(): fragment;
+
         String backStackName=fragment.getClass().getName();
         android.support.v4.app.FragmentManager fragmentManager=getSupportFragmentManager();
         //boolean fragmentPopped=fragmentManager.popBackStackImmediate(backStackName,0);

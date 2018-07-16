@@ -3,7 +3,7 @@
     android:initialKeyguardLayout="@layout/baking_widget"
     android:initialLayout="@layout/baking_widget"
     android:minHeight="50dp"
-    android:minWidth="100dp"
+    android:minWidth="200dp"
     android:previewImage="@drawable/example_appwidget_preview"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="8640000"

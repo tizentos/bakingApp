@@ -17,6 +17,7 @@ import ltd.boku.bakingapp.services.GridWidgetService;
 import ltd.boku.bakingapp.services.GridWidgetServiceIngredient;
 import ltd.boku.bakingapp.services.LoadRecipesService;
 
+import static ltd.boku.bakingapp.fragment.MainFragment.RECIPE_EXTRA;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.INGREDIENT_EXTRA;
 import static ltd.boku.bakingapp.services.LoadRecipesService.UPDATEWIDGET_INTENT;
 
@@ -30,12 +31,10 @@ public class BakingWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        Bundle options=appWidgetManager.getAppWidgetOptions(appWidgetId);
-        int width=options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
         RemoteViews views;
         if (showIngredient){
-            views=getIngredientRemoteView(context);
             showIngredient=false;
+            views=getIngredientRemoteView(context);
         }else{
             views=getRecipeRemoteView(context);
         }
@@ -47,6 +46,7 @@ public class BakingWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
         LoadRecipesService.startActionUpdateWidget(context);
+        showIngredient=false;
     }
 
     public static void updateRecipeWidget(Context context,AppWidgetManager appWidgetManager,int[] appWidgetIds){
@@ -70,34 +70,54 @@ public class BakingWidget extends AppWidgetProvider {
         // Enter relevant functionality for when the last widget is disabled
     }
 
-    private static  RemoteViews getRecipeRemoteView(Context context){
-        RemoteViews remoteViews=new RemoteViews(context.getPackageName(),R.layout.baking_widget);
-        Intent intent=new Intent(context,GridWidgetService.class);
-        remoteViews.setRemoteAdapter(R.id.widget_recipe_gridview,intent);
+    private static  RemoteViews getRecipeRemoteView(Context context) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.baking_widget);
+        Intent intent = new Intent(context, GridWidgetService.class);
+        remoteViews.setRemoteAdapter(R.id.widget_recipe_gridview, intent);
+        remoteViews.setTextViewText(R.id.widget_title, "Baking App");
 
 
-        Intent appIntent=new Intent(context,LoadRecipesService.class);
-        PendingIntent appPendingIntent=PendingIntent.getService(context,0,appIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        getIngredientWidget(context, remoteViews);
 
-        remoteViews.setPendingIntentTemplate(R.id.widget_recipe_gridview,appPendingIntent);
+        remoteViews.setEmptyView(R.id.widget_recipe_gridview, R.id.empty_view);
+        returnToRecipeWidget(context, remoteViews, R.id.widget_title);
 
-        remoteViews.setEmptyView(R.id.widget_recipe_gridview,R.id.empty_view);
+
         return remoteViews;
     }
+
+    private static  void getIngredientWidget(Context context,RemoteViews remoteViews){
+        Intent appIntent=new Intent(context,LoadRecipesService.class);
+        PendingIntent appPendingIntent=PendingIntent.getService(context,0,appIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setPendingIntentTemplate(R.id.widget_recipe_gridview,appPendingIntent);
+    }
+
     private static RemoteViews getIngredientRemoteView(Context context){
 
         RemoteViews remoteViews=new RemoteViews(context.getPackageName(),R.layout.ingredient_widget);
         Intent intent=new Intent(context,GridWidgetServiceIngredient.class);
         remoteViews.setRemoteAdapter(R.id.ingredient_gridview,intent);
+        remoteViews.setTextViewText(R.id.ingredient_widget_title,"Ingredient");
 
+        returnToRecipeWidget(context,remoteViews,R.id.ingredient_gridview);
+        setOnClickIngredientWidgetTitle(context,remoteViews);
+        return  remoteViews;
+    }
+
+    private static void returnToRecipeWidget(Context context, RemoteViews remoteViews, int resId) {
         Intent appIntent=new Intent(context,LoadRecipesService.class);
         appIntent.setAction(UPDATEWIDGET_INTENT);
         PendingIntent appPendingIntent=PendingIntent.getService(context,0,appIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setPendingIntentTemplate(resId,appPendingIntent);
+    }
 
-        remoteViews.setPendingIntentTemplate(R.id.ingredient_gridview,appPendingIntent);
-
-        remoteViews.setEmptyView(R.id.ingredient_gridview,R.id.ingredient_empty_view);
-        return remoteViews;
+    private static void setOnClickIngredientWidgetTitle(Context context, RemoteViews remoteViews) {
+        Bundle bundle=new Bundle();
+        bundle.putSerializable(RECIPE_EXTRA, LoadRecipesService.recipe);
+        Intent recipeIntent=new Intent(context,MainActivity.class);
+        recipeIntent.putExtras(bundle);
+        PendingIntent recipePendingIntent=PendingIntent.getActivity(context,0,recipeIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.ingredient_widget_title,recipePendingIntent);
     }
 }
 

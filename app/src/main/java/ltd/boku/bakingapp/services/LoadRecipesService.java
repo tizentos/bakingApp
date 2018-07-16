@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import ltd.boku.bakingapp.model.Ingredient;
 import ltd.boku.bakingapp.model.Recipe;
 import ltd.boku.bakingapp.utils.AppUtility;
 
+import static ltd.boku.bakingapp.fragment.MainFragment.RECIPE_EXTRA;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.INGREDIENT_EXTRA;
 
 public class LoadRecipesService extends IntentService {
@@ -24,6 +26,7 @@ public class LoadRecipesService extends IntentService {
     public static List<Ingredient> ingredients=new ArrayList<>();
 
     public static final String UPDATEWIDGET_INTENT="update-widget";
+    public static Recipe recipe;
 
     public LoadRecipesService() {
         super("LoadRecipesService");
@@ -40,8 +43,9 @@ public class LoadRecipesService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         List<Ingredient> ingredients=(List<Ingredient>) intent.getSerializableExtra(INGREDIENT_EXTRA);
+        Recipe recipe=(Recipe) intent.getSerializableExtra(RECIPE_EXTRA);
         if (ingredients != null){
-            handleIngredientWidgetUpdate(ingredients);
+            handleIngredientWidgetUpdate(ingredients,recipe);
         }
         if (intent != null){
             String action=intent.getAction();
@@ -62,8 +66,9 @@ public class LoadRecipesService extends IntentService {
         BakingWidget.updateRecipeWidget(this,appWidgetManager,appWidgetIds);
     }
 
-    private  void handleIngredientWidgetUpdate(List<Ingredient> ingredients){
+    private  void handleIngredientWidgetUpdate(List<Ingredient> ingredients, Recipe recipe){
         LoadRecipesService.ingredients=ingredients;
+        LoadRecipesService.recipe=recipe;
         AppWidgetManager appWidgetManager=AppWidgetManager.getInstance(this);
         int[] appWidgetIds= appWidgetManager.getAppWidgetIds(new ComponentName(this, BakingWidget.class));
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ingredient_gridview);

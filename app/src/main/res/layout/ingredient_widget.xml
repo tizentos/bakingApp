@@ -1,14 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
+
+    <TextView
+        android:id="@+id/ingredient_widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_title_background"
+        android:gravity="center"
+        android:padding="4dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        tools:text="Ingredient" />
 
     <GridView
         android:id="@+id/ingredient_gridview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="1" />
+        android:layout_gravity="center"
+        android:background="@drawable/widget_background"
+        android:numColumns="1"
+        android:verticalSpacing="1dp" />
 
     <RelativeLayout
         android:id="@+id/ingredient_empty_view"
@@ -26,4 +42,4 @@
             android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
-</FrameLayout>
+</LinearLayout>

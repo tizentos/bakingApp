@@ -1,14 +1,29 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_background"
+    android:orientation="vertical"
     android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:background="@drawable/widget_title_background"
+        android:gravity="top|center"
+        android:padding="4dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        tools:text="Click on a recipe" />
 
     <GridView
         android:id="@+id/widget_recipe_gridview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:numColumns="1" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/widget_background"
+        android:numColumns="1"
+        android:verticalSpacing="1dp" />
 
     <RelativeLayout
         android:id="@+id/empty_view"
@@ -25,6 +40,5 @@
             android:textColor="#ffffff"
             android:textSize="20sp"
             android:textStyle="bold" />
-
     </RelativeLayout>
-</FrameLayout>
+</LinearLayout>
