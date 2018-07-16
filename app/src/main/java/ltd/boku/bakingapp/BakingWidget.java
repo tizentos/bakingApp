@@ -25,9 +25,7 @@ import static ltd.boku.bakingapp.services.LoadRecipesService.UPDATEWIDGET_INTENT
  */
 public class BakingWidget extends AppWidgetProvider {
 
-    public static final String SHOW_INGREDIENT="show-ingredients";
     public static boolean showIngredient=false;
-     static List<Ingredient>  ingredients=new ArrayList<>();
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
