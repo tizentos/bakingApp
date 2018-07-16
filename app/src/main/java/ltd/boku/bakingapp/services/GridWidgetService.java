@@ -20,29 +20,17 @@ public class GridWidgetService  extends RemoteViewsService{
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        List<Ingredient> ingredients=(List<Ingredient>) intent.getSerializableExtra(INGREDIENT_EXTRA);
-        if (ingredients!=null){
-            return new GridRemoteViewFactory(this.getApplicationContext(),ingredients);
-        }
         return new GridRemoteViewFactory(this.getApplicationContext());
     }
 }
 
 class GridRemoteViewFactory implements RemoteViewsService.RemoteViewsFactory{
 
-    public static final String IS_INGREDIENT="isIngredient";
     Context context;
     List<Recipe> recipes=new ArrayList<>();
-    List<Ingredient> ingredients=new ArrayList<>();
-    boolean showIngredient=false;
 
     public GridRemoteViewFactory(Context applicationContext){
         context=applicationContext;
-    }
-    public GridRemoteViewFactory(Context applicationContext, List<Ingredient> ingredients){
-        this.context=applicationContext;
-        this.ingredients=ingredients;
-        showIngredient=true;
     }
     @Override
     public void onCreate() {
