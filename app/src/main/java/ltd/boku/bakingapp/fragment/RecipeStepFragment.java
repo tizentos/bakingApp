@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import ltd.boku.bakingapp.model.Recipe;
 import ltd.boku.bakingapp.model.Step;
 import ltd.boku.bakingapp.viewmodels.RecipeStepViewModel;
 
+import static android.support.constraint.Constraints.TAG;
 import static ltd.boku.bakingapp.fragment.MainFragment.RECIPE_EXTRA;
 
 public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAdapter.OnStepsClickListener{
@@ -119,4 +121,15 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
         listener.navigateToParticularStep(steps,position);
     }
 
+    @Override
+    public void onDetach() {
+        int count= getFragmentManager().getBackStackEntryCount();
+        Log.d(TAG, "onDetach: entering" + count);
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

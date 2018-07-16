@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.io.Serializable;
@@ -17,6 +18,7 @@ import ltd.boku.bakingapp.services.GridWidgetService;
 import ltd.boku.bakingapp.services.GridWidgetServiceIngredient;
 import ltd.boku.bakingapp.services.LoadRecipesService;
 
+import static android.support.constraint.Constraints.TAG;
 import static ltd.boku.bakingapp.fragment.MainFragment.RECIPE_EXTRA;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.INGREDIENT_EXTRA;
 import static ltd.boku.bakingapp.services.LoadRecipesService.UPDATEWIDGET_INTENT;
@@ -27,6 +29,7 @@ import static ltd.boku.bakingapp.services.LoadRecipesService.UPDATEWIDGET_INTENT
 public class BakingWidget extends AppWidgetProvider {
 
     public static boolean showIngredient=false;
+    private static final String TAG = "BakingWidget";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
@@ -45,6 +48,7 @@ public class BakingWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
+        Log.d(TAG, "onUpdate: entering");
         LoadRecipesService.startActionUpdateWidget(context);
         showIngredient=false;
     }
@@ -62,6 +66,8 @@ public class BakingWidget extends AppWidgetProvider {
 
     @Override
     public void onEnabled(Context context) {
+        Log.d(TAG, "onEnabled: entering");
+        LoadRecipesService.startActionUpdateWidget(context);
         // Enter relevant functionality for when the first widget is created
     }
 

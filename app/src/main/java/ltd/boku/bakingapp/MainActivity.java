@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity
 
         Recipe recipe=(Recipe)getIntent().getSerializableExtra(RECIPE_EXTRA);
         if (recipe !=null){
+            navigateToHome();
             navigateToRecipeStepListener(recipe);
             return;
         }
@@ -80,12 +81,12 @@ public class MainActivity extends AppCompatActivity
         mainActivityViewModel.getFragmentMutableLiveData().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
-                setCurrentFragment(fragment);
+                setCurrentFragment(fragment,true);
             }
         });
     }
 
-    private void setCurrentFragment(Fragment fragment) {
+    private void setCurrentFragment(Fragment fragment, boolean addToStack) {
 
         currentFragment= (fragment == null)? new MainFragment(): fragment;
 
@@ -93,11 +94,16 @@ public class MainActivity extends AppCompatActivity
         android.support.v4.app.FragmentManager fragmentManager=getSupportFragmentManager();
         //boolean fragmentPopped=fragmentManager.popBackStackImmediate(backStackName,0);
 
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame,fragment)
-                .addToBackStack(backStackName)
-                .commit();
-
+        if (addToStack) {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .addToBackStack(backStackName)
+                    .commit();
+        }else{
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .commit();
+        }
     }
 
     private void setupUIPeripheral() {
@@ -155,7 +161,7 @@ public class MainActivity extends AppCompatActivity
 
     public void navigateToHome(){
         MainFragment mainFragment=new MainFragment();
-        setCurrentFragment(mainFragment);
+        setCurrentFragment(mainFragment,false);
         //MainActivityViewModel.fragmentMutableLiveData.postValue(mainFragment);
     }
 
@@ -168,7 +174,7 @@ public class MainActivity extends AppCompatActivity
         RecipeStepFragment recipeStepFragment=new RecipeStepFragment();
         recipeStepFragment.setArguments(bundle);
         setTitle(recipe.getName());
-        setCurrentFragment(recipeStepFragment);
+        setCurrentFragment(recipeStepFragment,true);
       //  MainActivityViewModel.fragmentMutableLiveData.postValue(recipeStepFragment);
     }
 
@@ -179,7 +185,7 @@ public class MainActivity extends AppCompatActivity
         bundle.putSerializable(STEP_POSITION,position);
         ParticularStepFragment particularStepFragment=new ParticularStepFragment();
         particularStepFragment.setArguments(bundle);
-        setCurrentFragment(particularStepFragment);
+        setCurrentFragment(particularStepFragment,true);
        // MainActivityViewModel.fragmentMutableLiveData.postValue(particularStepFragment);
     }
 
@@ -188,4 +194,5 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().popBackStack(fragment.getClass().getName(),0);
         }
     }
+
 }

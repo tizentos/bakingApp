@@ -21,6 +21,7 @@ import ltd.boku.bakingapp.R;
 import ltd.boku.bakingapp.adapter.RecipeRecyclerViewAdapter;
 import ltd.boku.bakingapp.databinding.MainFragmentBinding;
 import ltd.boku.bakingapp.model.Recipe;
+import ltd.boku.bakingapp.services.LoadRecipesService;
 import ltd.boku.bakingapp.viewmodels.MainViewModel;
 
 public class MainFragment extends Fragment implements RecipeRecyclerViewAdapter.OnRecipeClickListener {
@@ -70,6 +71,7 @@ public class MainFragment extends Fragment implements RecipeRecyclerViewAdapter.
             public void onChanged(@Nullable List<Recipe> recipes) {
                 Log.d("Test", "onChanged: change");
                 recipeRecyclerViewAdapter.setRecipes(recipes);
+                LoadRecipesService.startActionUpdateWidget(getActivity());
             }
         });
     }
