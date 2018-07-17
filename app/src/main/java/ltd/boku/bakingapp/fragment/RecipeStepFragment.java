@@ -41,6 +41,9 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
     public static final String STEP_POSITION="position";
     public static final String INGREDIENT_EXTRA= "ingredient";
 
+    private static  int prevPosition=-1;
+    public static final String POSITION="position";
+
 
     public interface NavigateToParticularStep{
         void navigateToParticularStep(List<Step> steps,int position);
@@ -92,7 +95,7 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
     }
 
     public void setupRecyclerView(){
-        stepsRecyclerViewAdapter=new StepsRecyclerViewAdapter(this);
+        stepsRecyclerViewAdapter=new StepsRecyclerViewAdapter(getContext(),this);
         stepsRecyclerViewAdapter.setSteps(recipe.getSteps());
 
 
@@ -118,7 +121,29 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
     @Override
     public void onStepsClickListener(List<Step> steps,int position) {
         Toast.makeText(getContext(), steps.get(position).getShortDescription(), Toast.LENGTH_SHORT).show();
+
+        if (prevPosition != -1){
+            stepsRecyclerViewAdapter.notifyItemChanged(prevPosition);
+        }
+        prevPosition=position;
+        stepsRecyclerViewAdapter.selectItem(position);
         listener.navigateToParticularStep(steps,position);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(POSITION,prevPosition);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        prevPosition=savedInstanceState.getInt(POSITION,-1);
+        if(prevPosition !=-1) {
+            stepsRecyclerViewAdapter.selectItem(prevPosition);
+            stepsRecyclerViewAdapter.notifyItemChanged(prevPosition);
+        }
     }
 
     @Override

@@ -3,6 +3,7 @@ package ltd.boku.bakingapp.adapter;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,17 +18,19 @@ import ltd.boku.bakingapp.R;
 import ltd.boku.bakingapp.databinding.StepsCardBinding;
 import ltd.boku.bakingapp.model.Step;
 
-public class StepsRecyclerViewAdapter  extends RecyclerView.Adapter<StepsRecyclerViewAdapter.StepViewHolder>{
+public class StepsRecyclerViewAdapter  extends SelectableAdapter<StepsRecyclerViewAdapter.StepViewHolder>{
 
     OnStepsClickListener listener;
+    Context context;
     List<Step> steps=new ArrayList<>();
 
     public interface OnStepsClickListener{
         void onStepsClickListener(List<Step> steps,int position);
     }
 
-    public StepsRecyclerViewAdapter(OnStepsClickListener listener) {
-        this.listener = listener;
+    public StepsRecyclerViewAdapter(Context context,OnStepsClickListener listener) {
+         this.listener =  listener;
+         this.context=context;
     }
 
 
@@ -42,15 +45,31 @@ public class StepsRecyclerViewAdapter  extends RecyclerView.Adapter<StepsRecycle
     }
 
     @Override
-    public void onBindViewHolder(@NonNull StepViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull StepViewHolder holder,  int position) {
         final Step step=steps.get(position);
+        final int scopePosition=position;
         holder.stepName.setText(step.getShortDescription());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.stepCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              listener.onStepsClickListener(steps,position);
+              listener.onStepsClickListener(steps,scopePosition);
+                if (!isSelected(scopePosition)){
+                    v.setBackground(null);
+                }else{
+                    v.setSelected(true);
+                    v.setBackground(context.getResources().getDrawable(R.drawable.card_background));
+                    unSelectItem(scopePosition);
+                }
             }
         });
+
+        if (!isSelected(position)){
+            holder.stepCard.setSelected(false);
+        }else{
+            holder.stepCard.setSelected(true);
+            holder.stepCard.setBackground(context.getResources().getDrawable(R.drawable.card_background));
+        }
+
     }
 //
     @Override
@@ -67,10 +86,12 @@ public class StepsRecyclerViewAdapter  extends RecyclerView.Adapter<StepsRecycle
 
     public static class StepViewHolder extends RecyclerView.ViewHolder{
         TextView stepName;
+        CardView stepCard;
 
         public StepViewHolder(StepsCardBinding itemView) {
             super(itemView.getRoot());
             stepName=itemView.stepName;
+            stepCard=itemView.stepCard;
         }
     }
 }

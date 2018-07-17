@@ -23,4 +23,5 @@
     <string name="add_widget">Add widget</string>
     <string name="empty_view_text">No Reipes</string>
     <string name="empty_ingredient_text">No Ingredient</string>
+    <string name="no_video">No video demonstration for this step</string>
 </resources>

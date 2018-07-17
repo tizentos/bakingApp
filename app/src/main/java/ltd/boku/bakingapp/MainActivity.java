@@ -23,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.Serializable;
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity
 
     Fragment currentFragment;
     MainActivityViewModel mainActivityViewModel;
+    boolean twoPane=false;
+    FrameLayout childListLayout;
 
 
 
@@ -63,11 +66,17 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: entering");
+        mainBinding= DataBindingUtil.setContentView(this,R.layout.activity_main);
         //start services
         initiateRecipeLoadingService();
-        mainBinding= DataBindingUtil.setContentView(this,R.layout.activity_main);
         setupUIPeripheral();
         mainActivityViewModel=ViewModelProviders.of(this).get(MainActivityViewModel.class);
+
+        if (findViewById(R.id.child_list_frame_layout) != null){
+            twoPane = true;
+            childListLayout=findViewById(R.id.child_list_frame_layout);
+        }
+
 
         Recipe recipe=(Recipe)getIntent().getSerializableExtra(RECIPE_EXTRA);
         if (recipe !=null){
@@ -81,27 +90,31 @@ public class MainActivity extends AppCompatActivity
         mainActivityViewModel.getFragmentMutableLiveData().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
-                setCurrentFragment(fragment,true);
+                int resId;
+                resId= (fragment instanceof MainFragment) || (fragment instanceof RecipeStepFragment)
+                        ? R.id.content_frame : R.id.child_list_frame_layout;
+                setCurrentFragment(fragment,true,resId);
             }
         });
     }
 
-    private void setCurrentFragment(Fragment fragment, boolean addToStack) {
-
+    private void setCurrentFragment(Fragment fragment, boolean addToStack, int resId) {
         currentFragment= (fragment == null)? new MainFragment(): fragment;
+        performFragmentTransaction(fragment, addToStack, resId);
+    }
 
+    private void performFragmentTransaction(Fragment fragment, boolean addToStack, int ResId) {
         String backStackName=fragment.getClass().getName();
         android.support.v4.app.FragmentManager fragmentManager=getSupportFragmentManager();
-        //boolean fragmentPopped=fragmentManager.popBackStackImmediate(backStackName,0);
 
         if (addToStack) {
             fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment)
+                    .replace(ResId, fragment)
                     .addToBackStack(backStackName)
                     .commit();
         }else{
             fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment)
+                    .replace(ResId, fragment)
                     .commit();
         }
     }
@@ -160,32 +173,53 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void navigateToHome(){
+        Log.d(TAG, "navigateToHome: twopane" + twoPane);
+        if (twoPane) childListLayout.setVisibility(View.GONE);
         MainFragment mainFragment=new MainFragment();
-        setCurrentFragment(mainFragment,false);
+        setCurrentFragment(mainFragment,false,R.id.content_frame);
         //MainActivityViewModel.fragmentMutableLiveData.postValue(mainFragment);
     }
 
 
     @Override
     public void navigateToRecipeStepListener(Recipe recipe) {
+
+        if (twoPane) {
+            childListLayout.setVisibility(View.VISIBLE);
+        }
+
+
         Toast.makeText(this, recipe.getName(), Toast.LENGTH_SHORT).show();
         Bundle bundle=new Bundle();
         bundle.putSerializable(RECIPE_EXTRA,recipe);
         RecipeStepFragment recipeStepFragment=new RecipeStepFragment();
         recipeStepFragment.setArguments(bundle);
         setTitle(recipe.getName());
-        setCurrentFragment(recipeStepFragment,true);
+        setCurrentFragment(recipeStepFragment,true,R.id.content_frame);
       //  MainActivityViewModel.fragmentMutableLiveData.postValue(recipeStepFragment);
     }
 
     @Override
     public void navigateToParticularStep(List<Step> steps, int position) {
+
+        int ResId;
         Bundle bundle=new Bundle();
         bundle.putSerializable(STEPS_EXTRA, (Serializable) steps);
         bundle.putSerializable(STEP_POSITION,position);
         ParticularStepFragment particularStepFragment=new ParticularStepFragment();
         particularStepFragment.setArguments(bundle);
-        setCurrentFragment(particularStepFragment,true);
+
+
+        if (twoPane){
+            ResId = R.id.child_list_frame_layout;
+            childListLayout.setVisibility(View.VISIBLE);
+            setCurrentFragment(particularStepFragment,true,ResId);
+            getSupportFragmentManager().popBackStack();
+        }else {
+            ResId=R.id.content_frame;
+            setCurrentFragment(particularStepFragment,true,ResId);
+        }
+
        // MainActivityViewModel.fragmentMutableLiveData.postValue(particularStepFragment);
     }
 

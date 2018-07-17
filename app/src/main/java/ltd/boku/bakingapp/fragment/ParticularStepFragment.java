@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -39,6 +40,7 @@ import ltd.boku.bakingapp.model.Step;
 import ltd.boku.bakingapp.utils.AppUtility;
 import ltd.boku.bakingapp.viewmodels.ParticularStepViewModel;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.STEPS_EXTRA;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.STEP_POSITION;
 
@@ -56,10 +58,6 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
     private long playbackPosition;
     private int currentWindow;
     private boolean playWhenReady = false;
-
-
-    ImageButton buttonNext;
-    ImageButton buttonPrev;
     MainActivity mContext;
     ParticularStepViewModel particularStepViewModel;
 
@@ -136,16 +134,16 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
                 .createMediaSource(Uri.parse(step.getVideoURL()));
         player.prepare(mediaSource);
 
-    }
+        boolean isLandscape= (getContext().getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE);
+        if(isLandscape && getContext().getResources().getConfiguration().smallestScreenWidthDp < 600) {
+            int displayHeight = getContext().getResources().getDisplayMetrics().heightPixels;
+            Log.d(TAG, "setupVideoPlayer: display height: " + displayHeight);
+            ViewGroup.LayoutParams layoutParams = fragmentStepLayoutBinding.frameVideo.getLayoutParams();
+            layoutParams.height = displayHeight;
+            fragmentStepLayoutBinding.frameVideo.setLayoutParams(layoutParams);
+            mContext.getSupportActionBar().hide();
+        }
 
-    @SuppressLint("InlinedApi")
-    private void hideSystemUi() {
-        playerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
     @Override
@@ -186,6 +184,7 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
                 }
                 step=steps.get(position);
                 ParticularStepViewModel.stepMutableLiveData.postValue(step);
+                mContext.getSupportActionBar().show();
                 break;
             case R.id.imageButton_prev:
                 if (position-1 > -1 ){
@@ -195,20 +194,9 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
                 }
                 step=steps.get(position);
                 ParticularStepViewModel.stepMutableLiveData.postValue(step);
+                mContext.getSupportActionBar().show();
                 break;
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(TAG, "onDetach: entering");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d(TAG, "onDestroyView: entering");
     }
 
     @Override

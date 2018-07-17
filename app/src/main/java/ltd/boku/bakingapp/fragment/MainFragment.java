@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -76,10 +77,18 @@ public class MainFragment extends Fragment implements RecipeRecyclerViewAdapter.
         });
     }
     public void setupRecyclerView(){
+
+        int density=getResources().getConfiguration().smallestScreenWidthDp;
         RecyclerView recipeRecyclerView=mainFragmentBinding.recipeRecyclerView;
 //        RecyclerView recipeRecyclerView=getView().findViewById(R.id.recipe_recycler_view);
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
-        recipeRecyclerView.setLayoutManager(linearLayoutManager);
+        if (density< 600) {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+            recipeRecyclerView.setLayoutManager(linearLayoutManager);
+        }else{
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(),3);
+            recipeRecyclerView.setLayoutManager(gridLayoutManager);
+        }
+
         recipeRecyclerViewAdapter=new RecipeRecyclerViewAdapter(this);
         recipeRecyclerView.setAdapter(recipeRecyclerViewAdapter);
     }
