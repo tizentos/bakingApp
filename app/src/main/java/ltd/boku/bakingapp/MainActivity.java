@@ -4,13 +4,17 @@ import android.app.FragmentManager;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,9 +28,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.List;
 
 import ltd.boku.bakingapp.adapter.RecipeRecyclerViewAdapter;
@@ -39,6 +45,7 @@ import ltd.boku.bakingapp.model.Ingredient;
 import ltd.boku.bakingapp.model.Recipe;
 import ltd.boku.bakingapp.model.Step;
 import ltd.boku.bakingapp.services.LoadRecipesService;
+import ltd.boku.bakingapp.utils.AppUtility;
 import ltd.boku.bakingapp.viewmodels.MainActivityViewModel;
 import ltd.boku.bakingapp.viewmodels.MainViewModel;
 
@@ -59,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     MainActivityViewModel mainActivityViewModel;
     boolean twoPane=false;
     FrameLayout childListLayout;
+    public static ProgressBar loadingProgressBar;
 
 
 
@@ -67,33 +75,36 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: entering");
         mainBinding= DataBindingUtil.setContentView(this,R.layout.activity_main);
-        //start services
-        initiateRecipeLoadingService();
+        loadingProgressBar=findViewById(R.id.loading_progress_bar);
         setupUIPeripheral();
-        mainActivityViewModel=ViewModelProviders.of(this).get(MainActivityViewModel.class);
 
+
+        mainActivityViewModel=ViewModelProviders.of(this).get(MainActivityViewModel.class);
         if (findViewById(R.id.child_list_frame_layout) != null){
             twoPane = true;
             childListLayout=findViewById(R.id.child_list_frame_layout);
         }
-
-
         Recipe recipe=(Recipe)getIntent().getSerializableExtra(RECIPE_EXTRA);
         if (recipe !=null){
             navigateToHome();
             navigateToRecipeStepListener(recipe);
             return;
         }
-        if (savedInstanceState == null){
-            navigateToHome();
+        //start services
+        if (checkConnection() && savedInstanceState==null) {
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            initiateRecipeLoadingService();
+            if (savedInstanceState == null) {
+                navigateToHome();
+            }
         }
         mainActivityViewModel.getFragmentMutableLiveData().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
                 int resId;
-                resId= (fragment instanceof MainFragment) || (fragment instanceof RecipeStepFragment)
+                resId = (fragment instanceof MainFragment) || (fragment instanceof RecipeStepFragment)
                         ? R.id.content_frame : R.id.child_list_frame_layout;
-                setCurrentFragment(fragment,true,resId);
+                setCurrentFragment(fragment, true, resId);
             }
         });
     }
@@ -152,12 +163,15 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.home) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        }else if(id ==R.id.nav_home) {
+            navigateToHome();
+        }
+        else if (id == R.id.nav_gallery) {
 
         }  else if (id == R.id.nav_settings) {
 
         } else if (id == R.id.nav_share) {
-
+            shareApp();
         } else if (id == R.id.nav_send) {
 
         }
@@ -213,8 +227,8 @@ public class MainActivity extends AppCompatActivity
         if (twoPane){
             ResId = R.id.child_list_frame_layout;
             childListLayout.setVisibility(View.VISIBLE);
-            setCurrentFragment(particularStepFragment,true,ResId);
-            getSupportFragmentManager().popBackStack();
+            setCurrentFragment(particularStepFragment,false,ResId);
+          //  getSupportFragmentManager().popBackStack();
         }else {
             ResId=R.id.content_frame;
             setCurrentFragment(particularStepFragment,true,ResId);
@@ -226,6 +240,42 @@ public class MainActivity extends AppCompatActivity
     public  void popFragment(Fragment fragment){
         if (fragment!= null){
             getSupportFragmentManager().popBackStack(fragment.getClass().getName(),0);
+        }
+    }
+
+
+    public void shareApp(){
+        String mimeType="text/plain";
+
+        String title=getString(R.string.share_title);
+
+        ShareCompat.IntentBuilder.from(this)
+                .setType(mimeType)
+                .setChooserTitle(title)
+                .setText(getString(R.string.share_message))
+                .startChooser();
+    }
+
+
+    public boolean checkConnection(){
+        ConnectivityManager connectivityManager=(ConnectivityManager)this.getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] info=connectivityManager.getAllNetworkInfo();
+        for (int i = 0; i<info.length; i++){
+            if (info[i].getState() == NetworkInfo.State.CONNECTED){
+                return true;
+            }
+        }
+        Snackbar.make(mainBinding.appBarMainId.contentFrame,
+                "Internet not connected",Snackbar.LENGTH_INDEFINITE)
+                .setAction("RECONNECT", v -> reconnect()).show();
+//        progressBar.setVisibility(View.GONE);
+        return false;
+    }
+    void reconnect(){
+        boolean connected=checkConnection();
+        if (connected){
+            loadingProgressBar.setVisibility(View.VISIBLE);
+            initiateRecipeLoadingService();
         }
     }
 

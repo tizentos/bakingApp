@@ -9,12 +9,12 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_title">Let\'s bake together</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="nav_gallery">Gallery</string>
-    <string name="nav_settings">Tools</string>
+    <string name="nav_settings">Settings</string>
     <string name="ingredient_dashboard">%s Ingredients</string>
     <string name="shareIngredient">Share</string>
     <string name="share_title">Share ingredient with friends</string>
@@ -24,4 +24,6 @@
     <string name="empty_view_text">No Reipes</string>
     <string name="empty_ingredient_text">No Ingredient</string>
     <string name="no_video">No video demonstration for this step</string>
+    <string name="share_message">Hey friend! check out this latest app on preparing various recipes</string>
+    <string name="download_start_error">Failed to start download</string>
 </resources>

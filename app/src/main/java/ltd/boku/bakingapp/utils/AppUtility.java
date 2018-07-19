@@ -4,7 +4,11 @@ package ltd.boku.bakingapp.utils;
 import android.arch.lifecycle.LiveData;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,10 +19,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import ltd.boku.bakingapp.MainActivity;
 import ltd.boku.bakingapp.model.Ingredient;
 import ltd.boku.bakingapp.model.Measure;
 import ltd.boku.bakingapp.model.Recipe;
@@ -64,8 +71,10 @@ public class AppUtility {
 
 
     //handle http request and response
-    public static String getResponseFromHttpUrl(URL url) throws IOException {
+    public static String getResponseFromHttpUrl(URL url) throws IOException{
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+       // urlConnection.setConnectTimeout(5000);
+        urlConnection.setReadTimeout(5000);
         urlConnection.setRequestMethod("GET");
         urlConnection.connect();
         int res = urlConnection.getResponseCode();
@@ -149,6 +158,7 @@ public class AppUtility {
             MainViewModel.recipesLiveData.postValue(recipes);
             AppUtility.recipes=recipes;
             LoadRecipesService.recipes=recipes;
+            new MainActivity().runOnUiThread(() -> MainActivity.loadingProgressBar.setVisibility(View.GONE));
         }
 
         @Override
@@ -156,6 +166,7 @@ public class AppUtility {
             Log.d("Test", "doInBackground: loading");
             URL url=composeURL(strings[0],BAKINGPATH);
             String responseJSON=null;
+
             try{
                  responseJSON= getResponseFromHttpUrl(url);
             }catch (IOException e){

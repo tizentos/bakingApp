@@ -9,6 +9,7 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -17,4 +18,23 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CardText" parent="android:TextAppearance.Material">
+        <item name="android:textColor"> @color/primary_text</item>
+        <item name="android:fontFamily">acme</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+
+    <style name="StepText" parent="android:TextAppearance.Material.Body1">
+        <item name="android:textColor"> @color/primary_text</item>
+        <item name="android:fontFamily">acme</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
 </resources>

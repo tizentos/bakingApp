@@ -10,8 +10,6 @@
 
     <TextView
         android:id="@+id/widget_ingredient_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        style="@style/StepText"
         tools:text="Salt" />
 </LinearLayout>

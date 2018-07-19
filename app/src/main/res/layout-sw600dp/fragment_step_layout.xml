@@ -11,39 +11,51 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <FrameLayout
-                android:id="@+id/frame_video"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="8dp"
+            <!--<FrameLayout-->
+                <!--android:id="@+id/frame_video"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:layout_marginTop="8dp"-->
+                <!--app:layout_constraintBottom_toTopOf="@+id/guideline_top"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"-->
+                <!--app:layout_constraintHorizontal_bias="0.0"-->
+                <!--app:layout_constraintStart_toStartOf="parent"-->
+                <!--app:layout_constraintTop_toTopOf="parent"-->
+                <!--app:layout_constraintVertical_bias="0.0">-->
+
+            <TextView
+                android:id="@+id/no_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/no_video"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                android:textColor="@color/secondary_text"
+                android:visibility="visible"
                 app:layout_constraintBottom_toTopOf="@+id/guideline_top"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0">
+                app:layout_constraintVertical_bias="0.501" />
 
-                <TextView
-                    android:id="@+id/no_video"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="@string/no_video"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    android:visibility="visible" />
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/player_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@+id/guideline_top"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.449">
 
-                <com.google.android.exoplayer2.ui.PlayerView
-                    android:id="@+id/player_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginStart="8dp"
-                    android:visibility="visible">
-
-                </com.google.android.exoplayer2.ui.PlayerView>
-            </FrameLayout>
+            </com.google.android.exoplayer2.ui.PlayerView>
+            <!--</FrameLayout>-->
 
 
             <FrameLayout
@@ -59,12 +71,14 @@
 
                 <TextView
                     android:id="@+id/step_instruction_text"
-                    android:layout_width="wrap_content"
+                    style="@style/StepText"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:gravity="center"
+                    android:textSize="16sp"
                     tools:text="Pur the salt , this is a detailed step" />
             </FrameLayout>
 

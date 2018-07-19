@@ -41,7 +41,7 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
     public static final String STEP_POSITION="position";
     public static final String INGREDIENT_EXTRA= "ingredient";
 
-    private static  int prevPosition=-1;
+    public static  int prevPosition=-1;
     public static final String POSITION="position";
 
 
@@ -139,7 +139,11 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        prevPosition=savedInstanceState.getInt(POSITION,-1);
+        if (savedInstanceState != null) prevPosition=savedInstanceState.getInt(POSITION,-1);
+        highlightStep();
+    }
+
+    private void highlightStep() {
         if(prevPosition !=-1) {
             stepsRecyclerViewAdapter.selectItem(prevPosition);
             stepsRecyclerViewAdapter.notifyItemChanged(prevPosition);
@@ -150,11 +154,17 @@ public class RecipeStepFragment extends Fragment implements StepsRecyclerViewAda
     public void onDetach() {
         int count= getFragmentManager().getBackStackEntryCount();
         Log.d(TAG, "onDetach: entering" + count);
+        prevPosition=-1;
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 }
