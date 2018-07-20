@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import ltd.boku.bakingapp.MainActivity;
 import ltd.boku.bakingapp.R;
 import ltd.boku.bakingapp.adapter.RecipeRecyclerViewAdapter;
 import ltd.boku.bakingapp.databinding.MainFragmentBinding;
@@ -55,6 +56,9 @@ public class MainFragment extends Fragment implements RecipeRecyclerViewAdapter.
         Log.d(TAG, "onCreateView: entering");
         mainFragmentBinding= DataBindingUtil.inflate(inflater, R.layout.main_fragment,container,false);
 //        View view=inflater.inflate(R.layout.main_fragment,container,false);
+        if (((MainActivity)getContext()).childListLayout != null){
+            ((MainActivity)getContext()).childListLayout.setVisibility(View.GONE);
+        }
         return mainFragmentBinding.getRoot();
 //        return view;
     }
@@ -82,7 +86,7 @@ public class MainFragment extends Fragment implements RecipeRecyclerViewAdapter.
         int density=getResources().getConfiguration().smallestScreenWidthDp;
         RecyclerView recipeRecyclerView=mainFragmentBinding.recipeRecyclerView;
 //        RecyclerView recipeRecyclerView=getView().findViewById(R.id.recipe_recycler_view);
-        if (density< 600) {
+        if (!getResources().getBoolean(R.bool.isTablet)) {
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
             recipeRecyclerView.setLayoutManager(linearLayoutManager);
         }else{
@@ -90,7 +94,7 @@ public class MainFragment extends Fragment implements RecipeRecyclerViewAdapter.
             recipeRecyclerView.setLayoutManager(gridLayoutManager);
         }
 
-        recipeRecyclerViewAdapter=new RecipeRecyclerViewAdapter(this);
+        recipeRecyclerViewAdapter=new RecipeRecyclerViewAdapter(getContext(),this);
         DividerItemDecoration dividerItemDecoration=new DividerItemDecoration(getActivity().getApplicationContext(),
                 DividerItemDecoration.VERTICAL);
         recipeRecyclerView.addItemDecoration(dividerItemDecoration);

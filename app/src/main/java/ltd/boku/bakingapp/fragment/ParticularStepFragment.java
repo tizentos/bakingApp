@@ -82,24 +82,24 @@ import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.STEPS_EXTRA;
 import static ltd.boku.bakingapp.fragment.RecipeStepFragment.STEP_POSITION;
 
-public class ParticularStepFragment extends Fragment implements View.OnClickListener{
+public class ParticularStepFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ParticularStepFragment";
 
     FragmentStepLayoutBinding fragmentStepLayoutBinding;
     private SimpleExoPlayer player;
     PlayerView playerView;
-    public static final DefaultBandwidthMeter BANDWIDTH_METER=new DefaultBandwidthMeter();
-    public static final String PLAYBACK_POSITION="playback-position";
-    public static final String CURRENT_WINDOW="current-window";
-    public static final String PLAY_WHEN_READY="playwhen-ready";
+    public static final DefaultBandwidthMeter BANDWIDTH_METER = new DefaultBandwidthMeter();
+    public static final String PLAYBACK_POSITION = "playback-position";
+    public static final String CURRENT_WINDOW = "current-window";
+    public static final String PLAY_WHEN_READY = "playwhen-ready";
     private DataSource.Factory mediaDataSourceFactory;
     MediaSource mediaSource;
     private DefaultTrackSelector.Parameters trackSelectorParameters;
 
 
-    public List<Step> steps= new ArrayList<>();
-    public Step step=new Step();
-    int position=-1;
+    public List<Step> steps = new ArrayList<>();
+    public Step step = new Step();
+    int position = -1;
 
 
     private long playbackPosition;
@@ -112,14 +112,14 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d(TAG, "onAttach: entering: position= "+ position);
-       // this.setRetainInstance(true);
-        mContext=(MainActivity)context;
-        steps=(List<Step>) getArguments().getSerializable(STEPS_EXTRA);
-        if(position < 0){
-            position=(int)getArguments().getSerializable(STEP_POSITION);
+        Log.d(TAG, "onAttach: entering: position= " + position);
+        // this.setRetainInstance(true);
+        mContext = (MainActivity) context;
+        steps = (List<Step>) getArguments().getSerializable(STEPS_EXTRA);
+        if (position < 0) {
+            position = (int) getArguments().getSerializable(STEP_POSITION);
         }
-        step=steps.get(position);
+        step = steps.get(position);
     }
 
     @Override
@@ -130,20 +130,21 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        fragmentStepLayoutBinding= DataBindingUtil.inflate(inflater, R.layout.fragment_step_layout,container,false);
+        fragmentStepLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_step_layout, container, false);
+        mediaDataSourceFactory = buildDataSourceFactory(true);
         Log.d(TAG, "onCreateView: entering");
         particularStepViewModel = ViewModelProviders.of(this).get(ParticularStepViewModel.class);
         fragmentStepLayoutBinding.imageButtonNext.setOnClickListener(this);
         fragmentStepLayoutBinding.imageButtonPrev.setOnClickListener(this);
-        if (savedInstanceState!= null){
-            position=savedInstanceState.getInt(STEP_POSITION,0);
-            currentWindow=savedInstanceState.getInt(CURRENT_WINDOW,0);
-            playbackPosition=savedInstanceState.getLong(PLAYBACK_POSITION,0);
-            playWhenReady=savedInstanceState.getBoolean(PLAY_WHEN_READY,false);
-            if(player!=null){
-                player.seekTo(currentWindow,playbackPosition);
+        if (savedInstanceState != null) {
+            position = savedInstanceState.getInt(STEP_POSITION, 0);
+            currentWindow = savedInstanceState.getInt(CURRENT_WINDOW, 0);
+            playbackPosition = savedInstanceState.getLong(PLAYBACK_POSITION, 0);
+            playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY, false);
+            if (player != null) {
+                player.seekTo(currentWindow, playbackPosition);
             }
-            step=steps.get(position);
+            step = steps.get(position);
             ParticularStepViewModel.stepMutableLiveData.postValue(step);
         }
         ParticularStepViewModel.setStepMutableLiveData(step);
@@ -177,7 +178,7 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
 
 
     private DataSource.Factory buildDataSourceFactory(boolean useBandwidthMeter) {
-        return ((MediaPlayerUtils)mContext.getApplication()).buildDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
+        return ((MediaPlayerUtils) mContext.getApplication()).buildDataSourceFactory(useBandwidthMeter ? BANDWIDTH_METER : null);
     }
 
     private MediaSource buildMediaSource(Uri uri) {
@@ -217,21 +218,21 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
             }
         }
     }
+
     private List<?> getOfflineStreamKeys(Uri uri) {
-        return (((MediaPlayerUtils)mContext.getApplication()).getDownloadTracker().getOfflineStreamKeys(uri));
+        return (((MediaPlayerUtils) mContext.getApplication()).getDownloadTracker().getOfflineStreamKeys(uri));
     }
 
     private void setupVideoPlayer() {
         if (player == null) {
             playerView = fragmentStepLayoutBinding.playerView;
-            mediaDataSourceFactory = buildDataSourceFactory(true);
             TrackSelection.Factory adaptiveTrackSelectionFactory = new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
             trackSelectorParameters = new DefaultTrackSelector.ParametersBuilder().build();
-            DefaultTrackSelector trackSelector=new DefaultTrackSelector(adaptiveTrackSelectionFactory);
+            DefaultTrackSelector trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
             trackSelector.setParameters(trackSelectorParameters);
 
             @DefaultRenderersFactory.ExtensionRendererMode int extensionRendererMode =
-                    ((MediaPlayerUtils)mContext.getApplication()).useExtensionRenderers()
+                    ((MediaPlayerUtils) mContext.getApplication()).useExtensionRenderers()
                             ? (DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
                             : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF;
 
@@ -242,27 +243,12 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
                     trackSelector,
                     new DefaultLoadControl());
 
-
-//            DefaultHttpDataSourceFactory httpDataSourceFactory =
-//                    new DefaultHttpDataSourceFactory(
-//                            Util.getUserAgent(
-//                                    getContext(), getString(R.string.app_name)));
-//
-//            DefaultDataSourceFactory dataSourceFactory = new DefaultDataSourceFactory(getContext(), BANDWIDTH_METER, httpDataSourceFactory);
-//
-//
-//
-//
-//            ExtractorMediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-//                    .createMediaSource(Uri.parse(step.getVideoURL()));
-            mediaSource=buildMediaSource(Uri.parse(step.getVideoURL()));
-
-            player.seekTo(0);
+            mediaSource = buildMediaSource(Uri.parse(step.getVideoURL()));
         }
         playerView.setPlayer(player);
         player.setPlayWhenReady(playWhenReady);
         player.seekTo(currentWindow, playbackPosition);
-        player.prepare(mediaSource);
+        player.prepare(mediaSource,false,false);
         boolean isLandscape = (getContext().getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE);
         if (isLandscape && getContext().getResources().getConfiguration().smallestScreenWidthDp < 600) {
             int displayHeight = getContext().getResources().getDisplayMetrics().heightPixels;
@@ -278,27 +264,27 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        int viewId=v.getId();
-        switch(viewId){
+        int viewId = v.getId();
+        switch (viewId) {
             case R.id.imageButton_next:
-                if (position+1 < steps.size()){
-                    position+=1;
-                }else{
-                    position=0;
+                if (position + 1 < steps.size()) {
+                    position += 1;
+                } else {
+                    position = 0;
                 }
-                RecipeStepFragment.prevPosition=position;
-                step=steps.get(position);
+                RecipeStepFragment.prevPosition = position;
+                step = steps.get(position);
                 ParticularStepViewModel.stepMutableLiveData.postValue(step);
                 mContext.getSupportActionBar().show();
                 break;
             case R.id.imageButton_prev:
-                if (position-1 > -1 ){
-                    position-=1;
-                }else{
-                    position=steps.size()-1;
+                if (position - 1 > -1) {
+                    position -= 1;
+                } else {
+                    position = steps.size() - 1;
                 }
-                RecipeStepFragment.prevPosition=position;
-                step=steps.get(position);
+                RecipeStepFragment.prevPosition = position;
+                step = steps.get(position);
                 ParticularStepViewModel.stepMutableLiveData.postValue(step);
                 mContext.getSupportActionBar().show();
                 break;
@@ -309,15 +295,15 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState: entering");
-        if (player!=null){
-            currentWindow=player.getCurrentWindowIndex();
-            playbackPosition=player.getCurrentPosition();
+        if (player != null) {
+            currentWindow = player.getCurrentWindowIndex();
+            playbackPosition = Math.max(0,player.getContentPosition());
             playWhenReady = player.getPlayWhenReady();
-            outState.putBoolean(PLAY_WHEN_READY,playWhenReady);
-            outState.putInt(CURRENT_WINDOW,currentWindow);
-            outState.putLong(PLAYBACK_POSITION,playbackPosition);
+            outState.putBoolean(PLAY_WHEN_READY, playWhenReady);
+            outState.putInt(CURRENT_WINDOW, currentWindow);
+            outState.putLong(PLAYBACK_POSITION, playbackPosition);
         }
-        outState.putInt(STEP_POSITION,position);
+        outState.putInt(STEP_POSITION, position);
     }
 
     @Override
@@ -336,14 +322,14 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if ((Util.SDK_INT <= 23 || player == null)) {
-//            setupVideoPlayer();
-//        }
-//    }
     private void releasePlayer() {
         if (player != null) {
             playbackPosition = player.getCurrentPosition();
@@ -351,7 +337,7 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
             playWhenReady = player.getPlayWhenReady();
             player.release();
             player = null;
-            mediaSource=null;
+            mediaSource = null;
         }
     }
 
@@ -363,6 +349,11 @@ public class ParticularStepFragment extends Fragment implements View.OnClickList
     @Override
     public void onDestroy() {
         super.onDestroy();
+        boolean saved=isStateSaved();
+        Log.d(TAG, "onDestroy: "+ saved);
+        if (getResources().getBoolean(R.bool.isTablet) && !saved) {
+           getFragmentManager().popBackStack();
+        }
     }
 }
 

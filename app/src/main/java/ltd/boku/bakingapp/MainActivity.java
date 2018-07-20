@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.transition.Slide;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity
     Fragment currentFragment;
     MainActivityViewModel mainActivityViewModel;
     boolean twoPane=false;
-    FrameLayout childListLayout;
+    public static FrameLayout childListLayout;
     public static ProgressBar loadingProgressBar;
 
 
@@ -117,6 +119,11 @@ public class MainActivity extends AppCompatActivity
     private void performFragmentTransaction(Fragment fragment, boolean addToStack, int ResId) {
         String backStackName=fragment.getClass().getName();
         android.support.v4.app.FragmentManager fragmentManager=getSupportFragmentManager();
+        Slide slide=new Slide();
+        slide.addTarget(mainBinding.appBarMainId.contentFrame);
+        slide.setInterpolator(AnimationUtils.loadInterpolator(this,android.R.interpolator.linear_out_slow_in));
+        slide.setDuration(1000);
+        fragment.setEnterTransition(slide);
 
         if (addToStack) {
             fragmentManager.beginTransaction()
@@ -164,6 +171,9 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.home) {
             // Handle the camera action
         }else if(id ==R.id.nav_home) {
+            for (int i=0; i<=getSupportFragmentManager().getBackStackEntryCount();i++){
+                getSupportFragmentManager().popBackStack();
+            }
             navigateToHome();
         }
         else if (id == R.id.nav_gallery) {
@@ -191,6 +201,7 @@ public class MainActivity extends AppCompatActivity
         if (twoPane) childListLayout.setVisibility(View.GONE);
         MainFragment mainFragment=new MainFragment();
         setCurrentFragment(mainFragment,false,R.id.content_frame);
+        setTitle(getString(R.string.app_name));
         //MainActivityViewModel.fragmentMutableLiveData.postValue(mainFragment);
     }
 
@@ -227,14 +238,11 @@ public class MainActivity extends AppCompatActivity
         if (twoPane){
             ResId = R.id.child_list_frame_layout;
             childListLayout.setVisibility(View.VISIBLE);
-            setCurrentFragment(particularStepFragment,false,ResId);
-          //  getSupportFragmentManager().popBackStack();
+            setCurrentFragment(particularStepFragment,true,ResId);
         }else {
             ResId=R.id.content_frame;
             setCurrentFragment(particularStepFragment,true,ResId);
         }
-
-       // MainActivityViewModel.fragmentMutableLiveData.postValue(particularStepFragment);
     }
 
     public  void popFragment(Fragment fragment){

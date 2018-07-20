@@ -1,12 +1,16 @@
 package ltd.boku.bakingapp.adapter;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +22,16 @@ import ltd.boku.bakingapp.model.Recipe;
 public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecyclerViewAdapter.RecipeViewHolder> {
 
     OnRecipeClickListener listener;
+    Context context;
     List<Recipe> recipes=new ArrayList<>();
 
     public interface OnRecipeClickListener{
         void onRecipeClickListener(Recipe recipe);
     }
 
-    public RecipeRecyclerViewAdapter(OnRecipeClickListener listener) {
+    public RecipeRecyclerViewAdapter(Context context,OnRecipeClickListener listener) {
         this.listener = listener;
+        this.context=context;
     }
 
     public RecipeRecyclerViewAdapter(OnRecipeClickListener listener, List<Recipe> recipes) {
@@ -47,13 +53,14 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder,  int position) {
         final Recipe recipe=recipes.get(position);
+
+        Picasso.with(context)
+                .load(recipe.getImage().isEmpty()?null:recipe.getImage())
+                .error(context.getResources().getDrawable(R.drawable.recipe))
+                .placeholder(context.getResources().getDrawable(R.drawable.recipe))
+                .into(holder.recipeImage);
         holder.textRecipeName.setText(recipe.getName());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                listener.onRecipeClickListener(recipe);
-            }
-        });
+        holder.itemView.setOnClickListener(v -> listener.onRecipeClickListener(recipe));
     }
 
     @Override
@@ -68,10 +75,12 @@ public class RecipeRecyclerViewAdapter extends RecyclerView.Adapter<RecipeRecycl
     }
 
     public static class RecipeViewHolder extends RecyclerView.ViewHolder{
+        ImageView recipeImage;
         TextView textRecipeName;
         public RecipeViewHolder(RecipeCardBinding binding) {
             super(binding.getRoot());
             textRecipeName=binding.recipeName;
+            recipeImage=binding.recipeImage;
         }
     }
 }

@@ -1,15 +1,22 @@
 package ltd.boku.bakingapp.adapter;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,22 +51,28 @@ public class StepsRecyclerViewAdapter  extends SelectableAdapter<StepsRecyclerVi
         return stepViewHolder;
     }
 
+
+    @SuppressLint("NewApi")
     @Override
     public void onBindViewHolder(@NonNull StepViewHolder holder,  int position) {
         final Step step=steps.get(position);
         final int scopePosition=position;
+        Picasso.with(context)
+                .load(step.getThumbnailURL().isEmpty()?null: step.getThumbnailURL())
+                .placeholder(context.getDrawable(R.drawable.placeholder))
+                .error(context.getDrawable(R.drawable.placeholder))
+                .into(holder.stepThumbnail);
+
         holder.stepName.setText(step.getShortDescription());
-        holder.stepCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              listener.onStepsClickListener(steps,scopePosition);
-                if (!isSelected(scopePosition)){
-                    v.setBackground(null);
-                }else{
-                    v.setSelected(true);
-                    v.setBackground(context.getResources().getDrawable(R.drawable.card_background));
-                    unSelectItem(scopePosition);
-                }
+
+        holder.stepCard.setOnClickListener(v -> {
+          listener.onStepsClickListener(steps,scopePosition);
+            if (!isSelected(scopePosition)){
+                v.setBackground(null);
+            }else{
+                v.setSelected(true);
+                v.setBackground(context.getResources().getDrawable(R.drawable.card_background));
+                unSelectItem(scopePosition);
             }
         });
 
@@ -87,11 +100,13 @@ public class StepsRecyclerViewAdapter  extends SelectableAdapter<StepsRecyclerVi
     public static class StepViewHolder extends RecyclerView.ViewHolder{
         TextView stepName;
         CardView stepCard;
+        ImageView stepThumbnail;
 
         public StepViewHolder(StepsCardBinding itemView) {
             super(itemView.getRoot());
             stepName=itemView.stepName;
             stepCard=itemView.stepCard;
+            stepThumbnail=itemView.thumbnailImageView;
         }
     }
 }
